@@ -1,11 +1,11 @@
 {
-  "name": "openmusic-api-versi-1",
+  "name": "k-12-news",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start-dev": "nodemon ./src/server.js",
-    "start-prod": "NODE_ENV=production node ./src/server.js",
+    "start": "node ./src/server.js",
     "lint": "eslint ./src",
     "migrate": "node-pg-migrate"
   },
