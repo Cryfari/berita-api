@@ -3,6 +3,7 @@ const {nanoid} = require('nanoid');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
 const AuthenticationError = require('../../exceptions/AuthenticationError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 /**
  * Service untuk menangani resource users
@@ -92,6 +93,18 @@ class UsersService {
     }
 
     return id;
+  }
+
+  async verifyAdmin(id) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1 AND role = $2',
+      values: [id, 'user'],
+    };
+    const result = await this._pool.query(query);
+
+    if (result.rows.length) {
+      throw new AuthorizationError('Akses Ditolak');
+    }
   }
 }
 

@@ -11,13 +11,13 @@ exports.up = async (pgm) => {
   const email = process.env.EMAIL;
   const role = 'super_admin';
 
-  pgm.sql(```INSERT INTO users (id, username, password, fullname, email, role)
+  pgm.sql(`INSERT INTO users (id, username, password, fullname, email, role)
               VALUES (
                 '${id}', '${username}', '${password}',
                 '${fullname}', '${email}', '${role}'
-              )```);
+              )`);
 };
 
 exports.down = (pgm) => {
-  pgm.sql(`DELETE FROM users WHERE password = '${process.env.USERNAME_ADMIN}'`);
+  pgm.sql(`DELETE FROM users WHERE username = '${process.env.USERNAME_ADMIN}'`);
 };

@@ -11,6 +11,11 @@ const authentications = require('./api/authentications');
 const AuthenticationsService = require(
     './services/postgres/AuthenticationsService',
 );
+
+const news = require('./api/news');
+const NewsService = require('./services/postgres/NewsService');
+const NewsValidator = require('./validator/news');
+
 const producersService = require('./services/rabbitmq/ProducerService');
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
@@ -19,6 +24,7 @@ const AuthenticationsValidator = require('./validator/authentications');
 const init = async () => {
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
+  const newsService = new NewsService();
 
 
   const server = Hapi.server({
@@ -40,7 +46,7 @@ const init = async () => {
     },
   ]);
 
-  server.auth.strategy('openmusic_jwt', 'jwt', {
+  server.auth.strategy('k12news_jwt', 'jwt', {
     keys: process.env.ACCESS_TOKEN_KEY,
     verify: {
       aud: false,
@@ -72,6 +78,14 @@ const init = async () => {
         usersService,
         tokenManager: TokenManager,
         validator: AuthenticationsValidator,
+      },
+    },
+    {
+      plugin: news,
+      options: {
+        newsService: newsService,
+        usersService: usersService,
+        validator: NewsValidator,
       },
     },
   ]);
