@@ -1,5 +1,7 @@
 require('dotenv').config();
 const config = require('./utils/config');
+const path = require('path');
+
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const Inert = require('@hapi/inert');
@@ -16,7 +18,21 @@ const news = require('./api/news');
 const NewsService = require('./services/postgres/NewsService');
 const NewsValidator = require('./validator/news');
 
-const producersService = require('./services/rabbitmq/ProducerService');
+const comments = require('./api/comments');
+const CommentsService = require('./services/postgres/CommentsService');
+const CommentsValidator = require('./validator/comments');
+
+const replies = require('./api/replies');
+const RepliesService = require('./services/postgres/RepliesService');
+const RepliesValidator = require('./validator/replies');
+
+const uploads = require('./api/uploads');
+const AvatarsService = require('./services/postgres/AvatarsService');
+const UploadsValidator = require('./validator/uploads');
+
+const StorageService = require('./services/storage/StorageService');
+const CoversService = require('./services/postgres/CoversService');
+
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
@@ -25,11 +41,21 @@ const init = async () => {
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const newsService = new NewsService();
-
+  const storageService = new StorageService(
+      path.resolve(__dirname, 'public/images'),
+  );
+  const storageAvatarService = new StorageService(
+      path.resolve(__dirname, 'api/uploads/file/avatar'),
+  );
+  const coversService = new CoversService();
+  const commentService = new CommentsService();
+  const repliesService = new RepliesService();
+  const avatarsService = new AvatarsService();
 
   const server = Hapi.server({
     port: config.app.port,
-    host: config.app.host,
+    host: config.app.nodeEnv.trim() === 'test' ?
+          config.app.hostTest : config.app.host,
     routes: {
       cors: {
         origin: ['*'],
@@ -67,7 +93,7 @@ const init = async () => {
       plugin: users,
       options: {
         usersService,
-        producersService,
+        avatarsService: avatarsService,
         validator: UsersValidator,
       },
     },
@@ -85,7 +111,38 @@ const init = async () => {
       options: {
         newsService: newsService,
         usersService: usersService,
+        coversService: coversService,
+        storageService: storageService,
+        commentService: commentService,
+        repliesService: repliesService,
         validator: NewsValidator,
+      },
+    },
+    {
+      plugin: comments,
+      options: {
+        newsService: newsService,
+        usersService: usersService,
+        commentService: commentService,
+        validator: CommentsValidator,
+      },
+    },
+    {
+      plugin: replies,
+      options: {
+        newsService: newsService,
+        usersService: usersService,
+        commentService: commentService,
+        repliesService: repliesService,
+        validator: RepliesValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        storageService: storageAvatarService,
+        avatarsService: avatarsService,
+        validator: UploadsValidator,
       },
     },
   ]);
@@ -124,6 +181,7 @@ const init = async () => {
   });
 
   await server.start();
+  // server.table().forEach((route) => console.log(`${route.method}\t${route.path}`));
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
 

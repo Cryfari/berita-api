@@ -4,6 +4,12 @@ const routes = (handler) => [
     path: '/addnews',
     handler: handler.postAddNewsHandler,
     options: {
+      payload: {
+        allow: 'multipart/form-data',
+        multipart: true,
+        output: 'stream',
+        maxBytes: 512000,
+      },
       auth: 'k12news_jwt',
     },
   },

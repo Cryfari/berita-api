@@ -94,7 +94,23 @@ class UsersService {
 
     return id;
   }
+  /**
+   * @param {string} id
+   */
+  async verifySuperAdmin(id) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1 AND role = $2',
+      values: [id, 'super_admin'],
+    };
+    const result = await this._pool.query(query);
 
+    if (!result.rows.length) {
+      throw new AuthorizationError('Akses Ditolak');
+    }
+  }
+  /**
+   * @param {string} id
+   */
   async verifyAdmin(id) {
     const query = {
       text: 'SELECT id FROM users WHERE id = $1 AND role = $2',
@@ -105,6 +121,113 @@ class UsersService {
     if (result.rows.length) {
       throw new AuthorizationError('Akses Ditolak');
     }
+  }
+  /**
+   * @param {string} id
+   */
+  async verifyUser(id) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new AuthenticationError('Anda belum terdaftar');
+    }
+  }
+  /**
+   * @param {string} id
+   */
+  async isAdmin(id) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1 AND role = $2',
+      values: [id, 'user'],
+    };
+    const result = await this._pool.query(query);
+
+    if (result.rows.length) {
+      return false;
+    }
+    return true;
+  }
+  /**
+   * @param {string} id
+   */
+  async getUsername(id) {
+    const query = {
+      text: 'SELECT username FROM users WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+    return result.rows[0].username;
+  }
+
+  /**
+   * get list user
+   */
+  async getAllUser() {
+    const query = {
+      text: 'SELECT id, username, email, fullname, role FROM users',
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
+  /**
+   * @param {string} id
+   * @param {string} newRole
+   */
+  async editRoleUser(id, newRole) {
+    const query = {
+      text: `UPDATE users SET role = $2
+              WHERE id = $1
+              RETURNING id`,
+      values: [id, newRole],
+    };
+    await this._pool.query(query);
+  }
+  /**
+   * @param {string} id
+   * @param {string} newUsername
+   */
+  async editUsername(id, newUsername) {
+    const query = {
+      text: `UPDATE users SET username = $2
+              WHERE id = $1
+              RETURNING id`,
+      values: [id, newUsername],
+    };
+    await this._pool.query(query);
+  }
+  /**
+   * @param {string} id
+   * @param {string} newEmail
+   */
+  async editEmail(id, newEmail) {
+    const query = {
+      text: `UPDATE users SET email = $2
+              WHERE id = $1
+              RETURNING id`,
+      values: [id, newEmail],
+    };
+    await this._pool.query(query);
+  }
+
+  /**
+   * @param {string} id
+   */
+  async getProfileUser(id) {
+    const query = {
+      text: `SELECT users.id, users.username, users.fullname,
+              users.role, users.email, avatars.filename AS avatar
+              FROM users 
+              LEFT JOIN avatars 
+              ON users.id = avatars."userId" 
+              WHERE users.id = $1`,
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+    return result.rows[0];
   }
 }
 

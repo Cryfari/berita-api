@@ -21,8 +21,7 @@ class StorageService {
    * @return {object}
    */
   writeFile(file, filename) {
-    const path = `${this._folder}/${filename}`;
-
+    const path = `${this._folder}/${filename}`
     const fileStream = fs.createWriteStream(path);
 
     return new Promise((resolve, reject) => {

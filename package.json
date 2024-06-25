@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-dev": "nodemon ./src/server.js",
-    "start": "node ./src/server.js",
+    "start-dev": "set NODE_ENV=test && nodemon ./src/server.js ",
+    "start": " node ./src/server.js",
     "lint": "eslint ./src",
-    "migrate": "node-pg-migrate"
+    "migrate": "node-pg-migrate",
+    "migrate:test": "node-pg-migrate -f ./src/utils/database/test.json"
   },
   "author": "pahrijal",
   "license": "ISC",

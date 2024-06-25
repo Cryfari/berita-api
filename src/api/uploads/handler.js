@@ -6,12 +6,12 @@ const autoBind = require('auto-bind');
 class UploadsHandler {
   /**
    * @param {service} storageService
-   * @param {service} coversService
+   * @param {service} avatarsService
    * @param {validator} validator
    */
-  constructor(storageService, coversService, validator) {
+  constructor(storageService, avatarsService, validator) {
     this._storageService = storageService;
-    this._coversService = coversService;
+    this._avatarsService = avatarsService;
     this._validator = validator;
 
     autoBind(this);
@@ -22,29 +22,29 @@ class UploadsHandler {
    * @param {Object} request
    * @param {Object} h
    */
-  async postUploadImageHandler(request, h) {
+  async postUploadImageUserHandler(request, h) {
     const {id} = request.params;
-    const {cover} = request.payload;
-    this._validator.validateImageHeaders(cover.hapi.headers);
+    const {image} = request.payload;
+    this._validator.validateImageHeaders(image.hapi.headers);
 
-    const coverIsExist = await this._coversService.getCover(id);
+    const avatarIsExist = await this._avatarsService.getAvatar(id);
 
-    const filename = +new Date() + cover.hapi.filename;
+    const filename = +new Date() + image.hapi.filename;
 
-    if (coverIsExist) {
-      await this._storageService.deleteFile(coverIsExist);
-      await this._coversService.updateCover(
+    if (avatarIsExist) {
+      await this._storageService.deleteFile(avatarIsExist);
+      await this._avatarsService.updateAvatar(
           filename, id,
       );
     } else {
-      await this._coversService.addCover(filename, id);
+      await this._avatarsService.addAvatar(filename, id);
     }
 
-    await this._storageService.writeFile(cover, filename);
+    await this._storageService.writeFile(image, filename);
 
     const response = h.response({
       status: 'success',
-      message: 'Sampul berhasil diunggah',
+      message: 'Gambar berhasil diunggah',
     });
     response.code(201);
     return response;
