@@ -34,7 +34,7 @@ exports.up = (pgm) => {
   pgm.addConstraint(
       'comments',
       'fk_comments.newsId_news.id',
-      'FOREIGN KEY("newsId") REFERENCES news(id)',
+      'FOREIGN KEY("newsId") REFERENCES news(id) ON DELETE CASCADE',
   );
 };
 
