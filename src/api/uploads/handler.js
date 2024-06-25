@@ -38,6 +38,7 @@ class UploadsHandler {
       );
     } else {
       await this._avatarsService.addAvatar(filename, id);
+      console.log('addAvatar');
     }
 
     await this._storageService.writeFile(image, filename);

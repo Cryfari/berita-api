@@ -24,7 +24,6 @@ class UsersHandler {
   async postUserHandler(request, h) {
     this._validator.validateUserPayload(request.payload);
     const {id, username} = await this._usersService.addUser(request.payload);
-    await this._avatarsService.addAvatar('', id);
     const response = h.response({
       status: 'success',
       message: 'User berhasil ditambahkan',
