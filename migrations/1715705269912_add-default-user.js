@@ -19,5 +19,5 @@ exports.up = async (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.sql(`DELETE FROM users WHERE username = '${process.env.USERNAME_ADMIN}'`);
+  pgm.sql(`DELETE FROM users WHERE role = 'super_admin'`);
 };
