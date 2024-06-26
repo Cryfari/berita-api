@@ -23,21 +23,22 @@ class UploadsHandler {
    * @param {Object} h
    */
   async postUploadImageUserHandler(request, h) {
-    const {id} = request.params;
+    const {id: credentialId} = request.auth.credentials;
     const {image} = request.payload;
     this._validator.validateImageHeaders(image.hapi.headers);
+    console.log(__dirname);
 
-    const avatarIsExist = await this._avatarsService.getAvatar(id);
+    const avatarIsExist = await this._avatarsService.getAvatar(credentialId);
 
     const filename = +new Date() + image.hapi.filename;
 
     if (avatarIsExist) {
       await this._storageService.deleteFile(avatarIsExist);
       await this._avatarsService.updateAvatar(
-          filename, id,
+          filename, credentialId,
       );
     } else {
-      await this._avatarsService.addAvatar(filename, id);
+      await this._avatarsService.addAvatar(filename, credentialId);
       console.log('addAvatar');
     }
 

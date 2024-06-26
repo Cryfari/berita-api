@@ -1,3 +1,5 @@
+const path = require('path');
+
 const routes = (handler) => [
   {
     method: 'POST',
@@ -42,6 +44,15 @@ const routes = (handler) => [
     handler: handler.deleteNewsHandler,
     options: {
       auth: 'k12news_jwt',
+    },
+  },
+  {
+    method: 'GET',
+    path: '/news/image/{param*}',
+    handler: {
+      directory: {
+        path: path.resolve(__dirname, 'file'),
+      },
     },
   },
 ];

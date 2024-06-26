@@ -15,6 +15,14 @@ const routes = (handler) => ([
       auth: 'k12news_jwt',
     },
   },
+  {
+    method: 'GET',
+    path: '/comments/all',
+    handler: handler.getAllCommentsHandler,
+    options: {
+      auth: 'k12news_jwt',
+    },
+  },
 ]);
 
 module.exports = routes;

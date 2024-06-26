@@ -37,15 +37,14 @@ class CommentsService {
   }
 
   /**
-   * @param {string} threadId
+   * @param {string} newsId
    * @param {string} commentId
    */
-  async deleteComment(threadId, commentId) {
+  async deleteComment(newsId, commentId) {
     const query = {
-      text: `UPDATE comments
-              SET is_delete = true
-              WHERE id = $1 AND thread = $2`,
-      values: [commentId, threadId],
+      text: `DELETE FROM comments
+              WHERE id = $1 AND "newsId" = $2`,
+      values: [commentId, newsId],
     };
     await this._pool.query(query);
   }
@@ -89,6 +88,19 @@ class CommentsService {
                 ON comments."userId" = users.id AND comments."newsId" = $1
                 ORDER BY comments."createdAt" DESC`,
       values: [newsId],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
+
+  /**
+   * get all comments
+   */
+  async getAllComments() {
+    const query = {
+      text: `SELECT comments.*, users.username
+              FROM comments INNER JOIN users
+              ON comments."userId" = users.id`,
     };
     const result = await this._pool.query(query);
     return result.rows;

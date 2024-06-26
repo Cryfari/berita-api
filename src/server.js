@@ -42,7 +42,7 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const newsService = new NewsService();
   const storageService = new StorageService(
-      path.resolve(__dirname, 'public/images'),
+      path.resolve(__dirname, 'api/news/file'),
   );
   const storageAvatarService = new StorageService(
       path.resolve(__dirname, 'api/uploads/file/avatar'),
@@ -181,7 +181,7 @@ const init = async () => {
   });
 
   await server.start();
-  // server.table().forEach((route) => console.log(`${route.method}\t${route.path}`));
+  server.table().forEach((route) => console.log(`${route.method}\t${route.path}`));
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
 

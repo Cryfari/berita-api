@@ -49,7 +49,7 @@ class CommentHandler {
    */
   async deleteCommentHandler(request) {
     const {newsId, commentId} = request.params;
-    await this._newsService.verifyNews(newsId);
+    await this._newsService.verifyNewsId(newsId);
     await this._commentService.verifyComment(commentId);
     const {id: credentialId} = request.auth.credentials;
     const isAdmin = this._usersService.isAdmin(credentialId);
@@ -57,7 +57,7 @@ class CommentHandler {
       this._commentService.verifyOwnerComment(commentId, credentialId);
     }
 
-    await this._commentService.deleteComment(commentId);
+    await this._commentService.deleteComment(newsId, commentId);
     return {
       status: 'success',
     };
@@ -66,19 +66,34 @@ class CommentHandler {
   /**
    * @param {string} newsId
    */
-  async getAllCommentsOfThread(newsId) {
-    const query = {
-      text: `SELECT comments.id,
-                comments.content,
-                comments.createdAt,
-                users.username
-                FROM comments INNER JOIN users
-                ON comments.userId = users.id AND comments.newsId = $1
-                ORDER BY comments.date ASC`,
-      values: [newsId],
-    };
-    const result = await this._pool.query(query);
-    return result.rows;
+  // async getAllCommentsOfThread(newsId) {
+  //   const query = {
+  //     text: `SELECT comments.id,
+  //               comments.content,
+  //               comments.createdAt,
+  //               users.username
+  //               FROM comments INNER JOIN users
+  //               ON comments.userId = users.id AND comments.newsId = $1
+  //               ORDER BY comments.date ASC`,
+  //     values: [newsId],
+  //   };
+  //   const result = await this._pool.query(query);
+  //   return result.rows;
+  // }
+
+  /**
+   * @param {object} request
+   * @param {object} h
+   */
+  async getAllCommentsHandler(request, h) {
+    const {id: credentialId} = request.auth.credentials;
+    await this._usersService.verifyAdmin(credentialId);
+    const data = await this._commentService.getAllComments();
+    const response = h.response({
+      status: 'success',
+      data: data,
+    });
+    return response;
   }
 }
 

@@ -39,8 +39,8 @@ class RepliesService {
    */
   async deleteReply(repliesId, commentId) {
     const query = {
-      text: `DELETE replies
-              WHERE id = $1 AND comment = $2`,
+      text: `DELETE FROM replies
+              WHERE id = $1 AND "commentId" = $2`,
       values: [repliesId, commentId],
     };
     await this._pool.query(query);
@@ -91,6 +91,18 @@ class RepliesService {
     if (!result.rowCount) {
       throw new AuthorizationError('anda bukan pemilik komentar');
     }
+  }
+  /**
+   * get all replies
+   */
+  async getAllReplies() {
+    const query = {
+      text: `SELECT replies.*, users.username
+              FROM replies INNER JOIN users
+              ON replies."userId" = users.id`,
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 
