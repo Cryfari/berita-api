@@ -229,6 +229,20 @@ class UsersService {
     const result = await this._pool.query(query);
     return result.rows[0];
   }
+
+  /**
+   * @param {string} username
+   */
+  async verifyAvaliableUsername(username) {
+    const query = {
+      text: 'SELECT username FROM users WHERE username = $1',
+      values: [username],
+    };
+    const result = await this._pool.query(query);
+    if (result.rowCount) {
+      throw new InvariantError('username tidak tersedia');
+    }
+  }
 }
 
 module.exports = UsersService;
